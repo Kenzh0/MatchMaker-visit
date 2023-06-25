@@ -1,14 +1,14 @@
 import { useState, useRef, Suspense, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Points, PointMaterial, Preload } from "@react-three/drei";
+import { Points, PointMaterial, Preload, Text } from "@react-three/drei";
 import * as random from "maath/random/dist/maath-random.esm";
 // import { VideoTexture, MeshBasicMaterial} from 'three';
 import * as THREE from 'three';
+
 const Stars = (props) => {
   const ref = useRef();
   const [sphere] = useState(() => random.inSphere(new Float32Array(5000), { radius: 1.2 }));
   const [animationProgress, setAnimationProgress] = useState(0);
-  
   
   useFrame((state, delta) => {
     ref.current.rotation.x -= delta / 10;
@@ -49,6 +49,40 @@ const Stars = (props) => {
   );
 };
 
+const AnimatedText = () => {
+  const [showText, setShowText] = useState(false);
+  
+  useEffect(() => {
+    const showTextInterval = setInterval(() => {
+      setShowText(true);
+      
+      setTimeout(() => {
+        setShowText(false);
+      }, 10000);
+    }, 10000);
+    
+    return () => {
+      clearInterval(showTextInterval);
+    };
+  }, []);
+  
+  return showText && (
+    <Text
+      position={[0, 0, 0]}
+      color="#ffffff"
+      fontSize={0.2}
+      maxWidth={200}
+      lineHeight={1}
+      letterSpacing={0.02}
+      textAlign={'center'}
+      anchorX="center"
+      anchorY="middle"
+    >
+      MatchMaker
+    </Text>
+  );
+};
+
 const VideoTexture = ({ url }) => {
   const mesh = useRef();
   const video = useRef(document.createElement('video'));
@@ -83,7 +117,8 @@ const QRCanvas = () => {
       <Canvas camera={{ position: [0, 0, 1] }}>
         <Suspense fallback={null}>
           <Stars />
-          <VideoTexture url="/0001-0040.mp4" />
+          <VideoTexture url="/qr.mp4" />
+          <AnimatedText />
         </Suspense>
         
         <Preload all />
